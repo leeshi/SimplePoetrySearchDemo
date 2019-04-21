@@ -38,7 +38,7 @@ public class PoetryCrawler implements PoetryCrawlerBiz{
                 NowCount = 1;
 
             //生成目标url
-            String TarUrl = this.mPoetryWebUrl + "?type="+this.mSearchType +"&page=" + NowCount +"&value="+content;
+            String TarUrl = this.mPoetryWebUrl + "type="+this.mSearchType +"&page=" + NowCount +"&value="+content;
             System.out.println(TarUrl);
             try {
                 Connection conn = Jsoup.connect(TarUrl).timeout(3000);
@@ -61,7 +61,7 @@ public class PoetryCrawler implements PoetryCrawlerBiz{
                     Element contson = element.getElementsByAttributeValue("class","contson").get(0);
                     Element source = element.getElementsByAttributeValue("class","source").get(0);
                     Element title = element.getElementsByTag("b").get(0);
-                    String AfterRe = contson.html().replaceAll("<br>","").replaceAll("</?[^>]+>","").replaceAll("(/?)","");
+                    String AfterRe = contson.html().replaceAll("<br>","").replaceAll("</?[^>]+>","").replaceAll("\\(.*?\\)","");
                     list.add(new PoetryItem(AfterRe,title.text(),source.text()));
                 }
                 //test

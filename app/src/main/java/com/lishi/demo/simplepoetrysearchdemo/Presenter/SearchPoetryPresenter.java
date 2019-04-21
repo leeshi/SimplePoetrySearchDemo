@@ -2,6 +2,7 @@ package com.lishi.demo.simplepoetrysearchdemo.Presenter;
 
 
 import android.os.Handler;
+import android.util.Log;
 
 import com.lishi.demo.simplepoetrysearchdemo.Item.PoetryItem;
 import com.lishi.demo.simplepoetrysearchdemo.Model.OnSearchListener;
@@ -29,8 +30,11 @@ public class SearchPoetryPresenter {
             @Override
             public void searchSuccess(List<PoetryItem> list) {
                 //如果是第一次搜索就把之前保存的信息清空
-                if(searchPoetryView.ifSearched())
+                if(!searchPoetryView.ifSearched()) {
                     listAllPoetryItem.clear();
+                }
+
+                searchPoetryView.setSearched();
 
                 listAllPoetryItem.addAll(list);
                 mHandler.post(()->{

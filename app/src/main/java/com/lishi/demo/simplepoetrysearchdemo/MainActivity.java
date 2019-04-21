@@ -4,12 +4,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lishi.demo.simplepoetrysearchdemo.Adapter.PoetryListViewAdapter;
@@ -22,6 +23,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SearchPoetryView {
     private ListView mPoetryListView;
+    private View footerListView;
     private PoetryListViewAdapter mPoetryListViewAdapter;
 
     private Toolbar activityToolbar;
@@ -51,10 +53,7 @@ public class MainActivity extends AppCompatActivity implements SearchPoetryView 
         this.setSupportActionBar(activityToolbar);
 
         //init ListView
-        this.mPoetryListView = (ListView) findViewById(R.id.PoetryListView);
-        addListViewFootView();
-        this.mPoetryListViewAdapter = new PoetryListViewAdapter(this,new ArrayList<PoetryItem>());
-        this.mPoetryListView.setAdapter(this.mPoetryListViewAdapter);
+        initListView();
 
         //init SearchView
         this.mSearchView = findViewById(R.id.searchView);
@@ -78,16 +77,39 @@ public class MainActivity extends AppCompatActivity implements SearchPoetryView 
         });
     }
 
-    public void addListViewFootView(){
-        View footer = this.getLayoutInflater().inflate(R.layout.litview_footview, null);
-        ProgressBar footProgressBar = (ProgressBar) footer.findViewById(R.id.listview_footview_progressBar);
-        TextView foorTextView = (TextView) footer.findViewById(R.id.listview_footview_textview);
-        this.mPoetryListView.addFooterView(footer);
+    public void initListView(){
+        this.mPoetryListView = (ListView) findViewById(R.id.PoetryListView);
+        this.mPoetryListView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                switch (scrollState) {
+                    case SCROLL_STATE_IDLE:
+                        boolean toBottom = view.getLastVisiblePosition() == view.getCount() - 1;
+                        if (toBottom) {
+                            Log.d("ListView","到达底部");
+                            mSearchPoetryPresenter.search();
+                        }
+                        break;
+                }
+            }
 
-        footer.setVisibility(View.GONE);
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 
+            }
+        });
 
+        footerListView = this.getLayoutInflater().inflate(R.layout.litview_footview, null);
+        ProgressBar footProgressBar = (ProgressBar) footerListView.findViewById(R.id.listview_footview_progressBar);
+        //TODO 添加刷新样式
+        this.mPoetryListView.addFooterView(footerListView);
+
+        footerListView.setVisibility(View.GONE);
+
+        this.mPoetryListViewAdapter = new PoetryListViewAdapter(this,new ArrayList<>());
+        this.mPoetryListView.setAdapter(this.mPoetryListViewAdapter);
     }
+
 
     /*
      * 实现OnSearchListener接口
@@ -116,10 +138,17 @@ public class MainActivity extends AppCompatActivity implements SearchPoetryView 
     }
 
     @Override
+    public void setSearched(){
+        searched = true;
+    }
+
+    @Override
     public String getContent(){
         //TODO
         //获取信息
-        return this.SearchContent;
+        //测试而已
+        //return this.SearchContent;
+        return SearchContent;
     }
 
     @Override
@@ -130,21 +159,21 @@ public class MainActivity extends AppCompatActivity implements SearchPoetryView 
     @Override
     public void showLoading(){
         //TODO
-        Toast.makeText(this,"loading",Toast.LENGTH_LONG);
+        footerListView.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideLoading(){
         //TODO
+        footerListView.setVisibility(View.GONE);
     }
 
     //将诗句传送到主界面
     @Override
     public void toMainActivity(List<PoetryItem> list){
         //TODO
-        /*this.mPoetryItemList.clear();
-        this.mPoetryItemList.addAll(list);*/
         this.mPoetryListViewAdapter.update(list);
         this.mPoetryListViewAdapter.notifyDataSetChanged();
     }
 }
+

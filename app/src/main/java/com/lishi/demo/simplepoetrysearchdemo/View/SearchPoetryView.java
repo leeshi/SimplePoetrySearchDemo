@@ -7,6 +7,7 @@ import java.util.List;
 public interface SearchPoetryView {
     int getMode();
     boolean ifSearched();
+    void setSearched();
     String getContent();
 
     void clearPoetry();
