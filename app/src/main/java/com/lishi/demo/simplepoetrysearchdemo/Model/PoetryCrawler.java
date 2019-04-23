@@ -51,12 +51,20 @@ public class PoetryCrawler implements PoetryCrawlerBiz{
 
                 List<PoetryItem> list = new ArrayList<>();
 
-                if(NowCount == 1) {
-                    PageCount = Integer.parseInt(doc.getElementsByAttributeValue("id", "sumPage").get(0).text());
-                    System.out.println("sumPage: "+PageCount);
+                Elements pageCountElement = doc.getElementsByAttributeValue("id", "sumPage");
+                if(!pageCountElement.isEmpty()) {
+                    if(NowCount == 1){
+                        PageCount = Integer.parseInt(pageCountElement.get(0).text());
+                        System.out.println("sumPage: "+PageCount);
+                    }
+                    else if(NowCount > PageCount) {
+                        searchListener.searchOver();      //如果已经搜索到所有页面，结束所有搜索
+                        return;
+                    }
                 }
-                else if(NowCount > PageCount) {
-                    searchListener.searchOver();      //如果已经搜索到所有页面，结束所有搜索
+                //空集合，搜索不到内容
+                else{
+                    searchListener.searchFailed();
                     return;
                 }
 
@@ -68,10 +76,7 @@ public class PoetryCrawler implements PoetryCrawlerBiz{
                     String AfterRe = contson.html().replaceAll("<br>","").replaceAll("</?[^>]+>","").replaceAll("\\(.*?\\)","");
                     list.add(new PoetryItem(AfterRe,title.text(),source.text()));
                 }
-                //test
-                System.out.println("sum of poetry: "+ListDiv.size());
-
-                searchListener.searchSuccess(list);
+                    searchListener.searchSuccess(list);
             }
             catch(IOException e){
                 e.printStackTrace();
