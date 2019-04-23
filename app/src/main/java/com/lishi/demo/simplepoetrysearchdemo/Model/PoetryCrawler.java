@@ -1,5 +1,7 @@
 package com.lishi.demo.simplepoetrysearchdemo.Model;
 
+import android.util.Log;
+
 import com.lishi.demo.simplepoetrysearchdemo.Item.PoetryItem;
 
 import org.jsoup.Connection;
@@ -21,15 +23,19 @@ public class PoetryCrawler implements PoetryCrawlerBiz{
 
     /*
      * 1-> author
-     * 2-> poetry
+     * 2-> title
      */
     @Override
     public void SearchPoetry(int searchMode,boolean searched, String content, final OnSearchListener searchListener){
         new Thread( () ->{
+            String TarUrl;
             if(searchMode == 1)
-                this.mSearchType = "author";
+                TarUrl = this.mPoetryWebUrl + "type=author"+"&page=" + NowCount +"&value="+content;
+            else if(searchMode == 2)
+                TarUrl = this.mPoetryWebUrl + "title="+"&page=" + NowCount +"&value="+content;
             else
-                this.mSearchType = "title";
+                TarUrl = this.mPoetryWebUrl +"&page=" + NowCount +"&value="+content;
+
 
             //test
             System.out.println("ifSearched: "+searched);
@@ -37,9 +43,7 @@ public class PoetryCrawler implements PoetryCrawlerBiz{
             if(!searched)
                 NowCount = 1;
 
-            //生成目标url
-            String TarUrl = this.mPoetryWebUrl + "type="+this.mSearchType +"&page=" + NowCount +"&value="+content;
-            System.out.println(TarUrl);
+            Log.d("CrawlerTargetUrl",TarUrl);
             try {
                 Connection conn = Jsoup.connect(TarUrl).timeout(3000);
                 Document doc = Jsoup.parse(conn.get().html());

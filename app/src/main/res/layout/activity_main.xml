@@ -36,7 +36,23 @@
         app:defaultState="close"
         app:hintText="input name"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <Button
+            android:id="@+id/search_option_button"
+            android:layout_width="59dp"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/searchView"
+            android:layout_alignEnd="@+id/search"
+            android:layout_marginStart="153dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginRight="10dp"
+            android:elevation="6dp"
+
+            android:textAppearance="@style/TextAppearance.AppCompat.Button" />
+
+    </km.lmy.searchview.SearchView>
 
     <SearchView
         android:id="@+id/search"
@@ -59,6 +75,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="3dp"
         android:layout_marginBottom="8dp"
+        android:divider="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchView" />

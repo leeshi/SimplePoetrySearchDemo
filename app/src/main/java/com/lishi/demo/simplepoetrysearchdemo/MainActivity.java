@@ -5,9 +5,12 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AbsListView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
@@ -24,16 +27,19 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements SearchPoetryView {
     private ListView mPoetryListView;
     private View footerListView;
-    private PoetryListViewAdapter mPoetryListViewAdapter;
-
-    private Toolbar activityToolbar;
-    private SearchPoetryPresenter mSearchPoetryPresenter = new SearchPoetryPresenter(this);
     private km.lmy.searchview.SearchView mSearchView;
     private SearchView mSearchBut;
+    private Toolbar activityToolbar;
+    private Button buttonSearchOpetion;
+
+    private PoetryListViewAdapter mPoetryListViewAdapter;
+
+    private SearchPoetryPresenter mSearchPoetryPresenter = new SearchPoetryPresenter(this);
+
 
     private String SearchContent;
-
     private boolean searched;
+    private int mode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,24 +47,43 @@ public class MainActivity extends AppCompatActivity implements SearchPoetryView 
         this.requestWindowFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_main);
 
-        init();
-    }
 
-
-    private void init(){
         //init toolbar
         this.activityToolbar = findViewById(R.id.activity_toolbar);
         this.activityToolbar.setTitle(this.getTitle());
         this.activityToolbar.setTitleTextColor(Color.WHITE);
         this.setSupportActionBar(activityToolbar);
 
+        //init button
+        buttonSearchOpetion = findViewById(R.id.search_option_button);
+        buttonSearchOpetion.setOnClickListener((v)-> {
+            mode++;
+            switch (mode%3){
+                case 1:
+                    buttonSearchOpetion.setText("作者");
+                    return;
+                case 2:
+                    buttonSearchOpetion.setText("题目");
+                    return;
+                case 0:
+                    buttonSearchOpetion.setText("模糊");
+                    return;
+            }
+        });
+
         //init ListView
         initListView();
 
         //init SearchView
+        initSearchView();
+    }
+
+
+    public void initSearchView(){
         this.mSearchView = findViewById(R.id.searchView);
         List<String> HistoryList = new ArrayList<>();
         this.mSearchView.setNewHistoryList(HistoryList);
+
 
         this.mSearchView.setOnSearchActionListener((v)->{
             SearchContent = this.mSearchView.getEditTextView().getText().toString();
@@ -66,6 +91,11 @@ public class MainActivity extends AppCompatActivity implements SearchPoetryView 
             searched = false;
             this.mSearchPoetryPresenter.search();
             this.mSearchView.getEditTextView().setText("");
+            this.mSearchView.close();
+        });
+
+        //隐藏按钮
+        this.mSearchView.setOnSearchBackIconClickListener((v)->{
             this.mSearchView.close();
         });
 
@@ -104,6 +134,9 @@ public class MainActivity extends AppCompatActivity implements SearchPoetryView 
         //TODO 添加刷新样式
         this.mPoetryListView.addFooterView(footerListView);
 
+        this.mPoetryListView.setFooterDividersEnabled(false);
+        this.mPoetryListView.setHeaderDividersEnabled(false);
+
         footerListView.setVisibility(View.GONE);
 
         this.mPoetryListViewAdapter = new PoetryListViewAdapter(this,new ArrayList<>());
@@ -121,15 +154,7 @@ public class MainActivity extends AppCompatActivity implements SearchPoetryView 
 
     @Override
     public int getMode(){
-        //TODO
-        // 还没有添加类型选择
-        String text = "作者";
-        int mode;
-        if(text.equals("作者"))
-            mode = 1;
-        else
-            mode = 0;
-        return mode;
+        return mode % 3;
     }
 
     @Override
